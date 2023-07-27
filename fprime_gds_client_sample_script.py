@@ -15,6 +15,7 @@ This script is designed to connect to the GDS system using standard GDS argument
 @author lestarch
 """
 import sys
+import time
 from typing import Any, Dict, Tuple
 
 from fprime_gds.executables.cli import ParserBase, StandardPipelineParser  # Import CLI helpers
@@ -49,6 +50,10 @@ class SpecificChannel(DataHandler):
             channels_by_name: python dictionary of channel name to fprime ChannelTemplate dictionary entries
             name: string of channel name
         """
+        self.last_value = {
+            key: None for key in channels_by_name.keys()
+        }
+        
         self.id = channels_by_name[name].id
 
     def data_callback(self, data, sender=None):
@@ -57,9 +62,11 @@ class SpecificChannel(DataHandler):
         This function is called on every channel received by the GDS. In this specific case, the ID of the incoming
         channel is checked against the supplied ID. If the ID matches, the channel is printed.
         """
-        if data.id == self.id:
-            print(data)
+        self.last_value[data.name] = data
 
+    def dump_data():
+        for key, channel in self.last_value.items()
+            # AIT specific
 
 class ChannelNameParser(ParserBase):
     """  GDS style argument parser used to add an argument specifically for this script
@@ -121,7 +128,8 @@ def main():
         pipeline.coders.register_channel_consumer(channel_handler)
         # Run until CTRL-C shutdown
         while True:
-            pass
+            time.sleep(60)
+            chanbel_handler.dump_data()
     except KeyboardInterrupt:
         # Ignore Keyboard interrupt (CTRL-C) as this is a normal shutdown
         pass
